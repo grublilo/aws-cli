@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create VPC, Public Subnet, Private Subnet, and Route Tables
+Parameters:
+  VpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: CIDR block for the VPC
+  PublicSubnetCidr:
+    Type: String
+    Default: 10.0.1.0/24
+    Description: CIDR block for the public subnet
+  PrivateSubnetCidr:
+    Type: String
+    Default: 10.0.2.0/24
+    Description: CIDR block for the private subnet
+  AvailabilityZone:
+    Type: String
+    Default: eu-west-3a
+    Description: Availability Zone for the subnets
+Resources:
+  exampleVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: MyVPC
+  examplePublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref exampleVPC
+      CidrBlock: !Ref PublicSubnetCidr
+      AvailabilityZone: !Ref AvailabilityZone
+      Tags:
+        - Key: Name
+          Value: PublicSubnet
+  examplePrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref exampleVPC
+      CidrBlock: !Ref PrivateSubnetCidr
+      AvailabilityZone: !Ref AvailabilityZone
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet
+  examplePublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref exampleVPC
+      Tags:
+        - Key: Name
+          Value: PublicRouteTable
+  examplePrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref exampleVPC
+      Tags:
+        - Key: Name
+          Value: PrivateRouteTable
+  examplePublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref examplePublicSubnet
+      RouteTableId: !Ref examplePublicRouteTable
+  examplePrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref examplePrivateSubnet
+      RouteTableId: !Ref examplePrivateRouteTable
