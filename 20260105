@@ -1,0 +1,29 @@
+#1. create-subnet for related VPC
+aws ec2 create-subnet --vpc-id vpc-0b515e03c8a833b09 --cidr-block 192.168.20.0/24 --availability-zone-id euw3-az1 --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=my-subnet2}]'
+#2. create-route-table for related VPC
+aws ec2 create-route-table --vpc-id vpc-0b515e03c8a833b09 --query 'RouteTable.RouteTableId' --output text
+#3. binding subnet with route-table
+aws ec2 associate-route-table --route-table-id rtb-022c67965d71efb76 --subnet-id subnet-01a8d63cabe4e149d
+
+aws ec2 create-route --route-table-id rtb-022c67965d71efb76 --destination-cidr-block 0.0.0.0/0 --gateway-id igw-03134a2d68993967a
+#5. attach-internet-gateway to VPC
+aws ec2 attach-internet-gateway --internet-gateway-id igw-03134a
+aws ec2 create-route --route-table-id rtb-022c67965d71efb76 --destination-cidr-block 0.0.0.0/0 --gateway-id igw-03134a2d68993967a
+igw-03134a2d68993967a
+#4. create-internet-gateway
+aws ec2 create-internet-gateway --query 'InternetGateway.InternetGatewayId' --output text
+#6. create-network-acl for related VPC
+aws ec2 create-network-acl --vpc-id vpc-00142ddc13090c2b0
+ aws ec2 delete-network-acl --network-acl-id acl-07bfc4e3eba62c066
+
+aws ec2 create-network-acl-entry --network-acl-id acl-07bfc4e3eba62c066 --ingress --rule-number 101 --protocol udp --port-range From=53,To=53 --cidr-block 0.0.0.0/0 --rule-action allow
+aws ec2 create-network-acl-entry --network-acl-id acl-07bfc4e3eba62c066 --egress --rule-number 99 --protocol udp --port-range From=54,To=54 --cidr-block 0.0.0.0/0 --rule-action deny
+
+
+
+aws ec2 replace-network-acl-entry --network-acl-id acl-07bfc4e3eba62c066 --ingress --rule-number 101 --protocol tcp --port-range From=53,To=53 --cidr-block 0.0.0.0/0 --rule-action allow
+
+aws ec2 replace-network-acl-entry --network-acl-id acl-07bfc4e3eba62c066 --egress --rule-number 99 --protocol tcp --port-range From=54,To=54 --cidr-block 0.0.0.0/0 --rule-action deny
+
+aws ec2 delete-network-acl-entry --network-acl-id acl-07bfc4e3eba62c066  --ingress --rule-number 101
+aws ec2 delete-network-acl-entry --network-acl-id acl-07bfc4e3eba62c066  --egress --rule-number 99
